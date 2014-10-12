@@ -36,7 +36,18 @@ object MyModule {
 
   // Exercise 1: Write a function to compute the nth fibonacci number
 
-  def fib(n: Int): Int = ???
+  def fib(n: Int): Int = {
+    @annotation.tailrec
+    def fibR(f2: Int, f1: Int, nn: Int): Int = {
+      val f0 = f1 + f2
+      if (nn >= n) f0
+      else fibR(f1, f0, nn + 1)
+    }
+
+    if (n == 0) 0
+    else if (n == 1) 1
+    else fibR(0, 1, 2)
+  }
 
   // This definition and `formatAbs` are very similar..
   private def formatFactorial(n: Int) = {
@@ -129,7 +140,7 @@ object PolymorphicFunctions {
 
   // Exercise 2: Implement a polymorphic function to check whether
   // an `Array[A]` is sorted
-  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = ???
+  def isSorted[A](as: Array[A], gt: (A, A) => Boolean): Boolean = as.zip(as.tail).forall { case (a, b) => gt(a, b) }
 
   // Polymorphic functions are often so constrained by their type
   // that they only have one implementation! Here's an example:
@@ -139,16 +150,28 @@ object PolymorphicFunctions {
 
   // Exercise 3: Implement `curry`.
 
+  // Example usage of partial1
+  // A Int
+  // B Char
+  // C String
+
+  def mulChar(a: Int, b: Char): String = List.fill(a)(b).mkString
+
+  mulChar(5,'*')
+
+  partial1(3, mulChar)
+
+  // Exercise 4: Implement `curry`.
+
   // Note that `=>` associates to the right, so we could
   // write the return type as `A => B => C`
-  def curry[A,B,C](f: (A, B) => C): A => (B => C) =
-    ???
-
+  def curry[A,B,C](f: (A, B) => C): A => (B => C) = a => b => f(a, b)
+  // new ((A) => (B => C)){def apply(a: A) = f(a, _)}
   // NB: The `Function2` trait has a `curried` method already
 
   // Exercise 4: Implement `uncurry`
-  def uncurry[A,B,C](f: A => B => C): (A, B) => C =
-    ???
+  def uncurry[A,B,C](f: A => B => C): (A, B) => C = (a, b) => f(a)(b)
+  //Function.uncurried(f)
 
   /*
   NB: There is a method on the `Function` object in the standard library,
@@ -162,6 +185,5 @@ object PolymorphicFunctions {
 
   // Exercise 5: Implement `compose`
 
-  def compose[A,B,C](f: B => C, g: A => B): A => C =
-    ???
+  def compose[A,B,C](f: B => C, g: A => B): A => C = a => f(g(a))
 }
